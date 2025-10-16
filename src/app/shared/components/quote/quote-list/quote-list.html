@@ -1,0 +1,7 @@
+@if (quotes().length > 0) {
+  @for (quote of quotes(); track quote.id) {
+    <quote [quote]="quote"/>
+  }
+} @else {
+  <p>Quotes loading...</p>
+}

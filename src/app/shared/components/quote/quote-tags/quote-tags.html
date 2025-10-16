@@ -1,0 +1,5 @@
+@if (tags().length > 0) {
+  @for (tag of tags(); track $index) {
+    <span class="rounded-md px-2 py-1 bg-cyan-100 dark:bg-cyan-900 text-cyan-600 dark:text-cyan-100 capitalize">{{tag}}</span>
+  }
+}
