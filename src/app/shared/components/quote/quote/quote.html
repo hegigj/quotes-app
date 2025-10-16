@@ -1,0 +1,11 @@
+<div class="flex justify-between">
+  <h3 class="font-medium text-sm text-slate-500">{{quote().author}}</h3>
+  <quote-tags [tags]="quote().tags"/>
+</div>
+<p class="font-semibold">
+  <em>"{{quote().content}}"</em>
+</p>
+<div class="flex justify-between">
+  <quote-votes/>
+  <quote-share-buttons/>
+</div>
