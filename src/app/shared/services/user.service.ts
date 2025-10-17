@@ -22,7 +22,12 @@ export class UserService {
         signedIn: true
       });
 
-      users = users.splice(userIndex, 1, this.user() as IUser);
+      users = users.map((user, index) => {
+        if (index === userIndex) {
+          return this._user() as IUser
+        }
+        return user;
+      });
     } else {
       this._user.set({
         user: email,
@@ -47,14 +52,15 @@ export class UserService {
       });
 
       this._user.set(null);
+      this.storageService.setItem(StorageConfig.user, users);
     }
   }
 
   public addTag(tag: string): void {
-    if (this.user() !== null) {
+    if (this._user() !== null) {
       let users = this.storageService.getItem<IUser[]>(StorageConfig.user) ?? [];
 
-      let tags = this.user()?.tags ?? [];
+      let tags = this._user()?.tags ?? [];
       const tagSet = new Set(tags);
       tagSet.add(tag);
       if (tags.length >= 10 && tagSet.size >= tags.length) {
@@ -64,9 +70,14 @@ export class UserService {
 
       this._user.update(user => ({ ...(user as IUser), tags }));
 
-      const userIndex = users.findIndex(u => u.user === this.user()?.user);
+      const userIndex = users.findIndex(u => u.user === this._user()?.user);
       if (userIndex !== -1) {
-        users = users.splice(userIndex, 1, this.user() as IUser);
+        users = users.map((user, index) => {
+          if (index === userIndex) {
+            return this._user() as IUser
+          }
+          return user;
+        });
 
         this.storageService.setItem(StorageConfig.user, users);
       }

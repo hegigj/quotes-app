@@ -1,1 +1,28 @@
-<p>header-options works!</p>
+@if (isLight()) {
+  <button class="bg-transparent rounded-full text-blue-900 p-1 cursor-pointer" type="button" (click)="switchMode()">
+    <span class="material-symbols-outlined">dark_mode</span>
+  </button>
+} @else {
+  <button class="bg-transparent rounded-full text-yellow-300 p-1 cursor-pointer" type="button" (click)="switchMode()">
+    <span class="material-symbols-outlined">sunny</span>
+  </button>
+}
+@if (user() !== null) {
+  <div class="flex items-center gap-2">
+    <p class="font-thin dark:text-slate-100">Hi, {{user()?.user}}</p>
+    <button
+      class="rounded-md flex items-center gap-1 bg-slate-300 text-red-900 border-solid border-red-900 cursor-pointer px-1 py-2"
+      type="button"
+      (click)="signOut()"
+    >
+      <span class="material-symbols-outlined">logout</span> Sign Out
+    </button>
+  </div>
+} @else {
+  <button
+    class="rounded-md flex items-center gap-1 bg-slate-300 text-cyan-900 cursor-pointer px-1 py-2"
+    type="button"
+    (click)="signIn()">
+    <span class="material-symbols-outlined">login</span> Sign In
+  </button>
+}

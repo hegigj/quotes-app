@@ -24,7 +24,7 @@ export class QuoteApi {
     }
 
     if (query.tag) {
-      params = params.append('tag', query.tag);
+      params = params.append('tags', query.tag);
     }
 
     return this.httpClient.get<PageOfDto<QuoteDto>>(ApiConfig.quotes, { params });

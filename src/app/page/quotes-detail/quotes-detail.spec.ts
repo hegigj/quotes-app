@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TagTab } from './tag-tab';
+import { QuotesDetail } from './quotes-detail';
 
-describe('TagTab', () => {
-  let component: TagTab;
-  let fixture: ComponentFixture<TagTab>;
+describe('QuotesDetail', () => {
+  let component: QuotesDetail;
+  let fixture: ComponentFixture<QuotesDetail>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TagTab]
+      imports: [QuotesDetail]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TagTab);
+    fixture = TestBed.createComponent(QuotesDetail);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

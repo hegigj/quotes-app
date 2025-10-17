@@ -1,1 +1,23 @@
-<p>quote-votes works!</p>
+<button
+  class="cursor-pointer rounded-tl-md rounded-bl-md px-2 py-1 flex align-center gap-1"
+  [class.bg-slate-300]="!upVoted()"
+  [class.text-cyan-900]="!upVoted()"
+  [class.bg-cyan-900]="upVoted()"
+  [class.text-slate-100]="upVoted()"
+  type="button"
+  (click)="voteQuote('up_vote')">
+  <span class="material-symbols-outlined">arrow_upward</span> {{upVoteCount()}}
+</button>
+<button
+  class="cursor-pointer rounded-tr-md rounded-br-md px-2 py-1 flex align-center gap-1"
+  [class.bg-slate-300]="!downVoted()"
+  [class.text-cyan-900]="!upVoted()"
+  [class.bg-cyan-900]="downVoted()"
+  [class.text-slate-100]="downVoted()"
+  type="button"
+  (click)="voteQuote('down_vote')">
+  <span class="material-symbols-outlined">arrow_downward</span>
+  @if (user() !== null && downVoted()) {
+    {{downVoteCount()}}
+  }
+</button>

@@ -11,4 +11,5 @@ import { Component, input } from '@angular/core';
 })
 export class QuoteTags {
   public tags = input.required<string[]>();
+  public tag = input<string | null>();
 }

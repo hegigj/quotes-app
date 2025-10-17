@@ -32,8 +32,8 @@
       "name": "api-cache",
       "urls": ["https://api.quotable.io/**"],
       "cacheConfig": {
-        "strategy": "freshness",
-        "timeout": "5s",
+        "strategy": "performance",
+        "timeout": "10s",
         "maxAge": "1h",
         "maxSize": 50
       }

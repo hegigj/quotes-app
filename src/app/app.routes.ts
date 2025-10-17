@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { quoteResolver } from './core/resolvers/quote-resolver';
+import { QuotesDetail } from './page/quotes-detail/quotes-detail';
 import { Quotes } from './page/quotes/quotes';
 
 export const routes: Routes = [
@@ -9,7 +11,19 @@ export const routes: Routes = [
   },
   {
     path: 'quote',
-    component: Quotes
+    children: [
+      {
+        path: '',
+        component: Quotes
+      },
+      {
+        path: ':QUOTE_ID',
+        component: QuotesDetail,
+        resolve: {
+          quote: quoteResolver
+        }
+      }
+    ]
   },
   {
     path: '**',

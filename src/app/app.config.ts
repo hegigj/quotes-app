@@ -15,7 +15,7 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([])
     ),
     provideServiceWorker('ngsw-worker.js', {
-      enabled: false,
+      enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'
     })
   ]

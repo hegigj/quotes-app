@@ -1,1 +1,14 @@
-<p>quote-share-buttons works!</p>
+@if (quote()) {
+  <button
+    class="cursor-pointer rounded-md px-2 py-1 flex align-center gap-1 bg-slate-300 text-cyan-900 font-bold"
+    type="button"
+    (click)="shareInFacebook()">
+    <span class="material-symbols-outlined">share</span> f
+  </button>
+  <button
+    class="cursor-pointer rounded-md px-2 py-1 flex align-center gap-1 bg-slate-300 text-cyan-900 font-bold"
+    type="button"
+    (click)="shareInX()">
+    <span class="material-symbols-outlined">share</span> X
+  </button>
+}

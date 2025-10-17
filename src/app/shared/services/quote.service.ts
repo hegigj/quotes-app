@@ -80,12 +80,9 @@ export class QuoteService {
 
   public loadQuotesByTag(tag: string): void {
     let quotesPerTagStore = this.storageService.getItem<QuotePerTagStore>(StorageConfig.quoteByTag) ?? {};
-    if (!quotesPerTagStore[tag] || quotesPerTagStore[tag].length === 0) {
-      return;
-    }
 
     const quotesPerTag: number = this.quotesPerTagMap[tag];
-    if (quotesPerTag <= quotesPerTagStore[tag].length) {
+    if (quotesPerTag <= (quotesPerTagStore[tag]?.length ?? 0)) {
       return;
     }
 
@@ -93,11 +90,9 @@ export class QuoteService {
 
     const loadQuotesByTag = (page: number): void => {
       this.quoteApi
-        .getQuotes({ page, limit: 30, tag })
+        .getQuotes({ page, limit: 50, tag })
         .subscribe(pageOfQuotes => {
-          if (page <= pageOfQuotes.totalPages) {
-            page++;
-
+          if (page < pageOfQuotes.totalPages) {
             quotesPerTagStore = {
               ...quotesPerTagStore,
               [tag]: pageOfQuotes.results.map(quote => ({
@@ -116,6 +111,9 @@ export class QuoteService {
 
             this.storageService.setItem(StorageConfig.quoteByTag, quotesPerTagStore);
 
+            if (page === 1) this.getQuotesByTag(tag);
+
+            page++;
             loadQuotesByTag(page);
           }
         });
@@ -124,7 +122,7 @@ export class QuoteService {
     loadQuotesByTag(1);
   }
 
-  public getQuotes(limit: number = 30): void {
+  public getQuotes(limit: number = 30, update: boolean = true): void {
     const quoteStore = this.storageService.getItem<QuoteStore>(StorageConfig.quote) ?? {};
     const newQuotes: IQuote[] = [];
 
@@ -140,26 +138,50 @@ export class QuoteService {
       }
     }
 
-    this._quotes.update(quotes => [...quotes, ...newQuotes]);
+    if (update) {
+      this._quotes.update(quotes => [...quotes, ...newQuotes]);
+    } else {
+      this._quotes.set(newQuotes);
+    }
+
     this.quoteSkipCount++;
   }
 
   public getQuotesByTag(tag: string): void {
+    this.quoteSkipCount = 0;
+
+    if (tag === 'All') {
+      this._quotes.set([]);
+      this.getQuotes();
+      return;
+    }
+
     const quotesPerTagStore = this.storageService.getItem<QuotePerTagStore>(StorageConfig.quoteByTag) ?? {};
 
-    this.quoteSkipCount = 0;
+    if (!quotesPerTagStore[tag] || quotesPerTagStore[tag].length === 0) {
+      this.loadQuotesByTag(tag);
+    }
+
     this._quotes.set(quotesPerTagStore[tag] ?? []);
   }
 
-  public async vote(vote: IVote): Promise<void> {
+  public getQuoteById(id: string): IQuote | null {
+    const quoteStore = this.storageService.getItem<QuoteStore>(StorageConfig.quote) ?? {};
+    return quoteStore[id] ?? null;
+  }
+
+  public vote(vote: IVote, tag: string | null = null): void {
     const { quoteId, vote: voteType, user } = vote;
 
-    let quoteStore = (await this.storageService.getItem<QuoteStore>(StorageConfig.quote)) ?? {};
+    let quoteStore = this.storageService.getItem<QuoteStore>(StorageConfig.quote) ?? {};
     const quote: IQuote | undefined = quoteStore[quoteId];
+
     if (quote) {
+      const userVotedUp = quote.votes.userVotedUp.findIndex(u => u === user);
+      const userVotedDown = quote.votes.userVotedDown.findIndex(u => u === user);
+
       switch (voteType) {
         case 'up_vote':
-          const userVotedUp = quote.votes.userVotedUp.findIndex(u => u === user);
           if (userVotedUp !== -1) {
             quote.votes.upVoteCount--;
             quote.votes.userVotedUp = quote.votes.userVotedUp.splice(userVotedUp, 1);
@@ -167,9 +189,12 @@ export class QuoteService {
           }
           quote.votes.upVoteCount++;
           quote.votes.userVotedUp.push(user);
+          if (userVotedDown !== -1) {
+            quote.votes.downVoteCount--;
+            quote.votes.userVotedDown = quote.votes.userVotedDown.splice(userVotedDown, 1);
+          }
           break;
         case 'down_vote':
-          const userVotedDown = quote.votes.userVotedDown.findIndex(u => u === user);
           if (userVotedDown !== -1) {
             quote.votes.downVoteCount--;
             quote.votes.userVotedDown = quote.votes.userVotedDown.splice(userVotedDown, 1);
@@ -177,30 +202,48 @@ export class QuoteService {
           }
           quote.votes.downVoteCount++;
           quote.votes.userVotedDown.push(user);
+          if (userVotedUp !== -1) {
+            quote.votes.upVoteCount--;
+            quote.votes.userVotedUp = quote.votes.userVotedUp.splice(userVotedUp, 1);
+          }
           break;
       }
 
-      quoteStore = { ...quoteStore, [quoteId]: quote };
+      this.storageService.setItem(StorageConfig.quote, quoteStore);
 
-      await this.storageService.setItem(StorageConfig.quote, quoteStore);
-
-      let quotesPerTagStore = (await this.storageService.getItem<QuotePerTagStore>(StorageConfig.quoteByTag)) ?? {};
-
+      let quotesPerTagStore = this.storageService.getItem<QuotePerTagStore>(StorageConfig.quoteByTag) ?? {};
       for (const tag of quote.tags) {
         const quotesPerTag = quotesPerTagStore[tag];
 
-        quotesPerTagStore = {
-          ...quotesPerTagStore,
-          [tag]: quotesPerTag.map(q => {
-            if (q.id === quoteId) {
-              return quote as IQuote;
-            }
+        if (quotesPerTag) {
+          quotesPerTagStore = {
+            ...quotesPerTagStore,
+            [tag]: quotesPerTag.map(q => {
+              if (q.id === quoteId) {
+                return quote;
+              }
 
-            return q;
-          })
-        };
+              return q;
+            })
+          };
+        } else {
+          quotesPerTagStore = {
+            ...quotesPerTagStore,
+            [tag]: [quote]
+          };
+        }
 
-        await this.storageService.setItem(StorageConfig.quoteByTag, quotesPerTagStore);
+        this.storageService.setItem(StorageConfig.quoteByTag, quotesPerTagStore);
+      }
+
+      if (tag !== null) {
+        this.getQuotesByTag(tag);
+      } else {
+        console.log('[QuoteService]: vote()', tag, vote.vote, quote);
+        const limit = this.quotes().length;
+        this._quotes.set([]);
+
+        this.getQuotes(limit, false);
       }
     }
   }

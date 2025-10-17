@@ -1,0 +1,13 @@
+@if (isUserSignedIn() && tabs().length > 0) {
+  @for (tab of tabs(); track $index) {
+    <button
+      class="cursor-pointer rounded-md px-2 py-1"
+      [class.bg-slate-300]="selectedTab() !== tab"
+      [class.text-cyan-900]="selectedTab() !== tab"
+      [class.bg-cyan-900]="selectedTab() === tab"
+      [class.text-slate-100]="selectedTab() === tab"
+      type="button"
+      (click)="selectTab(tab)"
+    >{{tab}}</button>
+  }
+}
