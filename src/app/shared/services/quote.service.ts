@@ -41,37 +41,40 @@ export class QuoteService {
     const loadQuotes = (page: number): void => {
       this.quoteApi
         .getQuotes({ page, limit: 50 })
-        .subscribe(pageOfQuotes => {
-          if (page < pageOfQuotes.totalPages) {
-            quoteStore = {
-              ...quoteStore,
-              ...pageOfQuotes.results.reduce(
-                (acc, quote) => ({
-                  ...acc,
-                  [quote._id]: {
-                    id: quote._id,
-                    author: quote.author,
-                    content: quote.content,
-                    tags: quote.tags,
-                    votes: quoteStore[quote._id]?.votes ?? {
-                      upVoteCount: 0,
-                      downVoteCount: 0,
-                      userVotedUp: [],
-                      userVotedDown: []
+        .subscribe({
+          next: pageOfQuotes => {
+            if (page < pageOfQuotes.totalPages) {
+              quoteStore = {
+                ...quoteStore,
+                ...pageOfQuotes.results.reduce(
+                  (acc, quote) => ({
+                    ...acc,
+                    [quote._id]: {
+                      id: quote._id,
+                      author: quote.author,
+                      content: quote.content,
+                      tags: quote.tags,
+                      votes: quoteStore[quote._id]?.votes ?? {
+                        upVoteCount: 0,
+                        downVoteCount: 0,
+                        userVotedUp: [],
+                        userVotedDown: []
+                      }
                     }
-                  }
-                }),
-                {}
-              )
-            };
+                  }),
+                  {}
+                )
+              };
 
-            this.storageService.setItem(StorageConfig.quote, quoteStore);
+              this.storageService.setItem(StorageConfig.quote, quoteStore);
 
-            if (page === 1) this.getQuotes();
+              if (page === 1) this.getQuotes();
 
-            page++;
-            loadQuotes(page);
-          }
+              page++;
+              loadQuotes(page);
+            }
+          },
+          error: () => this.getQuotes()
         });
     };
 
@@ -79,6 +82,11 @@ export class QuoteService {
   }
 
   public loadQuotesByTag(tag: string): void {
+    if (tag === 'All') {
+      this.loadQuotes();
+      return;
+    }
+
     let quotesPerTagStore = this.storageService.getItem<QuotePerTagStore>(StorageConfig.quoteByTag) ?? {};
 
     const quotesPerTag: number = this.quotesPerTagMap[tag];
