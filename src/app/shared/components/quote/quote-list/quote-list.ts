@@ -41,6 +41,7 @@ export class QuoteList implements OnInit, OnChanges {
       changes['tab'].currentValue !== null &&
       changes['tab'].currentValue !== changes['tab'].previousValue
     ) {
+      console.log('[QuoteList]: ngOnChanges()', this.tab)
       this.quoteService.loadQuotesByTag(this.tab as string);
     }
   }

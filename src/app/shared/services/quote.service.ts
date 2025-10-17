@@ -83,6 +83,7 @@ export class QuoteService {
 
     const quotesPerTag: number = this.quotesPerTagMap[tag];
     if (quotesPerTag <= (quotesPerTagStore[tag]?.length ?? 0)) {
+      this.getQuotesByTag(tag);
       return;
     }
 
@@ -92,7 +93,7 @@ export class QuoteService {
       this.quoteApi
         .getQuotes({ page, limit: 50, tag })
         .subscribe(pageOfQuotes => {
-          if (page < pageOfQuotes.totalPages) {
+          if (page === 1 || page < pageOfQuotes.totalPages) {
             quotesPerTagStore = {
               ...quotesPerTagStore,
               [tag]: pageOfQuotes.results.map(quote => ({
