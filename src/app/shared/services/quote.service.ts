@@ -184,27 +184,28 @@ export class QuoteService {
         case 'up_vote':
           if (userVotedUp !== -1) {
             quote.votes.upVoteCount--;
-            quote.votes.userVotedUp = quote.votes.userVotedUp.splice(userVotedUp, 1);
-            break;
-          }
-          quote.votes.upVoteCount++;
-          quote.votes.userVotedUp.push(user);
-          if (userVotedDown !== -1) {
-            quote.votes.downVoteCount--;
-            quote.votes.userVotedDown = quote.votes.userVotedDown.splice(userVotedDown, 1);
+            quote.votes.userVotedUp.splice(userVotedUp, 1);
+          } else {
+            quote.votes.upVoteCount++;
+            quote.votes.userVotedUp.push(user);
+            if (userVotedDown !== -1) {
+              quote.votes.downVoteCount--;
+              quote.votes.userVotedDown.splice(userVotedDown, 1);
+            }
           }
           break;
         case 'down_vote':
           if (userVotedDown !== -1) {
             quote.votes.downVoteCount--;
-            quote.votes.userVotedDown = quote.votes.userVotedDown.splice(userVotedDown, 1);
+            quote.votes.userVotedDown.splice(userVotedDown, 1);
             break;
-          }
-          quote.votes.downVoteCount++;
-          quote.votes.userVotedDown.push(user);
-          if (userVotedUp !== -1) {
-            quote.votes.upVoteCount--;
-            quote.votes.userVotedUp = quote.votes.userVotedUp.splice(userVotedUp, 1);
+          } else {
+            quote.votes.downVoteCount++;
+            quote.votes.userVotedDown.push(user);
+            if (userVotedUp !== -1) {
+              quote.votes.upVoteCount--;
+              quote.votes.userVotedUp.splice(userVotedUp, 1);
+            }
           }
           break;
       }
