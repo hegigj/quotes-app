@@ -1,7 +1,7 @@
 @if (tags().length > 0) {
   @for (t of tags(); track $index) {
     <span
-      class="rounded-md px-2 py-1 bg-cyan-100 dark:bg-cyan-900 text-cyan-600 dark:text-cyan-100 capitalize"
+      class="rounded-md px-2 py-1 text-xs font-medium bg-cyan-100 dark:bg-cyan-900 text-cyan-600 dark:text-cyan-100 capitalize"
       [class.text-medium]="t === tag()"
     >
       {{t}}

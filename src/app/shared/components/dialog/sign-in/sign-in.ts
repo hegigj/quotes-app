@@ -16,11 +16,11 @@ export class SignIn {
   private readonly dialogRef: DialogRef = inject(DialogRef);
   private readonly userService: UserService = inject(UserService);
 
-  protected emailControl = new FormControl<string | null>(null, [Validators.required, Validators.email]);
+  protected username = new FormControl<string | null>(null, [Validators.required]);
 
   protected signIn(): void {
-    if (this.emailControl.valid) {
-      this.userService.singIn(this.emailControl.value as string);
+    if (this.username.valid) {
+      this.userService.singIn(this.username.value as string);
       this.dialogRef.close(true);
     }
   }

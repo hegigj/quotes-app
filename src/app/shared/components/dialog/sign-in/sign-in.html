@@ -1,14 +1,12 @@
 <h3 class="font-semibold">Sign In</h3>
-<form class="flex flex-col gap-2" (ngSubmit)="signIn()">
+<form class="flex flex-col gap-4" (ngSubmit)="signIn()">
   <div class="flex flex-col justify-start">
-    <label for="email" class="font-normal">Email:</label>
-    <input id="email" type="email" name="email" [formControl]="emailControl" placeholder="hgjoka16@gmail.com">
-    @if (emailControl.invalid && emailControl.dirty) {
+    <label for="username" class="font-normal">Username:</label>
+    <input id="username" type="text" name="username" [formControl]="username" placeholder="Enter your username">
+    @if (username.invalid && username.dirty) {
       <span class="text-red-300 text-sm">
-      @if (emailControl.hasError('required')) {
-        Email is required!
-      } @else if (emailControl.hasError('email')) {
-        It must be a valid email!
+      @if (username.hasError('required')) {
+        Username is required!
       }
     </span>
     }
@@ -16,9 +14,9 @@
   <button
     class="flex justify-center rounded-md text-cyan-900 font-medium py-2 cursor-pointer"
     type="submit"
-    [class.bg-slate-100]="emailControl.valid"
-    [class.bg-slate-300]="emailControl.invalid"
-    [disabled]="emailControl.invalid">
+    [class.bg-slate-100]="username.valid"
+    [class.bg-slate-300]="username.invalid"
+    [disabled]="username.invalid">
     Sign in
   </button>
 </form>
